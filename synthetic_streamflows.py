@@ -35,6 +35,7 @@ julian=calender[:,2]
 # Synthetic HDD CDD calculation
 
 # Simulation data
+#sim_weather=pd.read_csv('Synthetic_weather/synthetic_weather_data.csv',header=0)
 sim_weather=pd.read_csv('Synthetic_weather/synthetic_weather_data.csv',header=0)
 
 # Load temperature data only
@@ -168,6 +169,7 @@ num_w_fields = z[1]
 count = 0
 rsquared = []
 
+DE=[]
 for h in H:
     
     # form linear regression model
@@ -187,6 +189,7 @@ for h in H:
             x = np.reshape(m,(1,num_w_fields))
             p = locals()[name].predict(x)
             predicted = np.append(predicted,p)
+    DE.append(predicted)
     
     residuals = predicted - S
     
@@ -230,6 +233,19 @@ for h in H:
             
     count = count + 1
 
+#mean=[]
+#mean2=[]
+#for i in range(0,108):
+#    m1=np.average(DE2[:,i])
+#    m2=np.average(P[:,i])
+#    mean.append(m1)
+#    mean2.append(m2)
+#
+#import matplotlib.pyplot as plt
+#
+#plt.plot(mean)
+#plt.plot(mean2)
+#    
 ######################################################################
 # now combine values predicted via regression with synthetic residuals
     
@@ -273,7 +289,17 @@ df_sim_totals = pd.DataFrame(sim_totals)
 H = list(headers)
 df_sim_totals.columns = H
 
-        
+
+#A1=[]
+#A2=[]
+#for h in H:
+#    a1=np.average(df_hist_totals.loc[:,h])
+#    a2=np.average(df_sim_totals.loc[:,h])
+#    A1.append(a1)
+#    A2.append(a2)
+#
+#plt.plot(A1)
+#plt.plot(A2)
 #####################################################################################
 # This section selects daily fractions which are paired with 
 # annual totals to arrive at daily streamflows
@@ -394,7 +420,7 @@ x_Hoover=Hoover_streamflow.loc[:,'Discharge'].values
 x_BPA=BPA_streamflow.loc[:,'1M':].values
 x_CA=CA_streamflow.loc[:,'ORO_fnf':].values
 x_WI=Willamette_streamflow.loc[:,'Albany':'LOP5E'].values
-x=np.column_stack((x_BPA,x_Hoover,x_CA,x_WI))
+x=np.column_stack((x_BPA,x_CA,x_WI,x_Hoover))
 x=np.reshape(x,(hist_years,365,num_gages))
 
 # historical daily fractions
@@ -412,12 +438,12 @@ for i in range(0,sim_years):
         
         if j <=num_BPA-1:
             output_BPA[(i*365):(i*365)+365,j]=fractions_hist[int(year_list[i]),:,j]*sim_totals[i,j]
-        elif j == num_BPA:
+        elif j == num_gages-1:
             output_Hoover[(i*365):(i*365)+365,0]=fractions_hist[int(year_list[i]),:,j]*sim_totals[i,j]
-        elif j>num_BPA and j<=num_BPA+num_CA:
-            output_CA[(i*365):(i*365)+365,j-num_BPA-1]=fractions_hist[int(year_list[i]),:,j]*sim_totals[i,j]
+        elif j>num_BPA-1 and j<=num_BPA+num_CA-1:
+            output_CA[(i*365):(i*365)+365,j-num_BPA]=fractions_hist[int(year_list[i]),:,j]*sim_totals[i,j]
         else:
-            output_WI[(i*365):(i*365)+365,j-num_BPA-1-num_CA]=fractions_hist[int(year_list[i]),:,j]*sim_totals[i,j]
+            output_WI[(i*365):(i*365)+365,j-num_BPA-num_CA]=fractions_hist[int(year_list[i]),:,j]*sim_totals[i,j]
     
     TDA[(i*365):(i*365)+365,0]=range(1,366)
 
