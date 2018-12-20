@@ -24,7 +24,7 @@ import scipy.stats as st
 
 # Import historical tmeperature data
 df_temp = pd.read_excel('Synthetic_streamflows/hist_temps_1953_2007.xlsx')
-his_temp_matrix = df_temp.values
+his_temp_matrix = df_temp.values 
 
 # Import calender 
 calender=pd.read_excel('Synthetic_streamflows/BPA_hist_streamflow.xlsx',sheetname='Calender',header= None)
@@ -35,8 +35,9 @@ julian=calender[:,2]
 # Synthetic HDD CDD calculation
 
 # Simulation data
-#sim_weather=pd.read_csv('Synthetic_weather/synthetic_weather_data.csv',header=0)
 sim_weather=pd.read_csv('Synthetic_weather/synthetic_weather_data.csv',header=0)
+
+
 
 # Load temperature data only
 cities = ['SALEM_T','EUGENE_T','SEATTLE_T','BOISE_T','PORTLAND_T','SPOKANE_T','FRESNO_T','LOS ANGELES_T','SAN DIEGO_T','SACRAMENTO_T','SAN JOSE_T','SAN FRANCISCO_T','TUCSON_T','PHOENIX_T','LAS VEGAS_T']
@@ -45,6 +46,8 @@ sim_temperature=sim_weather[cities]
 # Convert temperatures to Fahrenheit 
 sim_temperature= (sim_temperature*(9/5))+32
 sim_temperature=sim_temperature.values
+
+
 
 num_cities = len(cities)
 num_sim_days = len(sim_temperature)
@@ -223,6 +226,7 @@ for h in H:
             
             x = np.reshape(m,(1,num_w_fields))
             name='reg' + str(count)
+            x=np.nan_to_num(x)
             p = locals()[name].predict(x)
             predicted = np.append(predicted,p)
             
